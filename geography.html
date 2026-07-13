@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地理 - 古桥千秋</title>
+    <!-- 引入 ECharts -->
+    <script src="js/echarts.min.js"></script>
+    <!-- 引入数据 -->
+    <script src="data.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', 'SimSun', serif;
+            background-color: #f5f2e9;
+            background-image:
+                url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20chinese%20paper%20texture%20background%2C%20light%20brown%20color%2C%20subtle%20pattern&image_size=square_hd'),
+                radial-gradient(circle at 5% 15%, rgba(0,0,0,0.04) 0%, transparent 30%),
+                radial-gradient(circle at 95% 85%, rgba(0,0,0,0.04) 0%, transparent 30%);
+            background-size: cover, cover, cover;
+            background-attachment: fixed;
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* 水墨散墨装饰 */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        body::before {
+            top: 10%;
+            right: 5%;
+        }
+        
+        body::after {
+            bottom: 15%;
+            left: 3%;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #8B4513;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            padding: 15px 0;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        /* 标题装饰线 */
+        h1::before,
+        h1::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #c9a959, transparent);
+        }
+        
+        h1::before {
+            top: 0;
+        }
+        
+        h1::after {
+            bottom: 0;
+        }
+        
+        /* 标题两侧装饰 */
+        h1 .title-deco {
+            display: inline-block;
+            margin: 0 20px;
+            color: #c9a959;
+            font-size: 1.5rem;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background-color: rgba(139, 69, 19, 0.08);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid rgba(201, 169, 89, 0.3);
+            position: relative;
+        }
+        
+        /* 导航栏四角装饰 */
+        .nav::before,
+        .nav::after {
+            content: '◈';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #c9a959;
+            font-size: 1rem;
+            opacity: 0.6;
+        }
+        
+        .nav::before {
+            left: 10px;
+        }
+        
+        .nav::after {
+            right: 10px;
+        }
+        
+        .nav a {
+            margin: 0 20px;
+            text-decoration: none;
+            color: #8B4513;
+            font-weight: bold;
+            padding: 8px 18px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .nav a::before {
+            content: '「';
+            margin-right: 3px;
+            color: #c9a959;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .nav a::after {
+            content: '」';
+            margin-left: 3px;
+            color: #c9a959;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .nav a:hover {
+            background-color: rgba(139, 69, 19, 0.15);
+            color: #a52a2a;
+        }
+        
+        .nav a:hover::before,
+        .nav a:hover::after {
+            opacity: 1;
+        }
+        
+        .chart-container {
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(201, 169, 89, 0.2);
+            position: relative;
+        }
+        
+        /* 图表容器角落装饰 */
+        .chart-container::before,
+        .chart-container::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            opacity: 0.5;
+        }
+        
+        .chart-container::before {
+            top: 10px;
+            left: 10px;
+            border-top: 2px solid #c9a959;
+            border-left: 2px solid #c9a959;
+        }
+        
+        .chart-container::after {
+            bottom: 10px;
+            right: 10px;
+            border-bottom: 2px solid #c9a959;
+            border-right: 2px solid #c9a959;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            color: #5D4037;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(201, 169, 89, 0.3);
+            position: relative;
+        }
+        
+        /* 标题装饰点 */
+        .chart-title::before,
+        .chart-title::after {
+            content: '◆';
+            position: absolute;
+            bottom: -8px;
+            font-size: 0.6rem;
+            color: #c9a959;
+        }
+        
+        .chart-title::before {
+            left: 45%;
+        }
+        
+        .chart-title::after {
+            right: 45%;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 550px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+        }
+        
+        .small-chart {
+            width: 100%;
+            height: 450px;
+        }
+        
+        .bridge-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .bridge-card {
+            flex: 1 1 300px;
+            background-color: rgba(139, 69, 19, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #8B4513;
+        }
+        
+        .bridge-card h3 {
+            color: #8B4513;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart {
+                height: 400px;
+            }
+            
+            .small-chart {
+                height: 350px;
+            }
+        }
+
+        /* 查看数据分析按钮 */
+        .view-analysis-section {
+            display: flex;
+            justify-content: center;
+            margin: 60px 0;
+            padding-top: 40px;
+        }
+
+        .view-analysis-btn {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .view-analysis-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(139, 69, 19, 0.4);
+            background: linear-gradient(135deg, #A0522D, #8B4513);
+        }
+
+        .arrow-down {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 10px solid white;
+            animation: bounce 2s infinite;
+        }
+
+        .arrow-up {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(10px);
+            }
+            60% {
+                transform: translateY(5px);
+            }
+        }
+
+        .analysis-section-container {
+            margin-top: 80px;
+        }
+
+        /* 分析部分样式 */
+        .analysis-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            border: 1px solid #b89f66;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analysis-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #b22c2c, #b89f66);
+        }
+
+        .analysis-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .analysis-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .analysis-section {
+            background: rgba(245, 242, 233, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #b22c2c;
+            transition: all 0.3s ease;
+        }
+
+        .analysis-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .analysis-subtitle {
+            font-size: 1.3rem;
+            color: #b22c2c;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .analysis-section p {
+            color: #2c3e50;
+            line-height: 1.7;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .analysis-section p:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            color: #8B4513;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .modal-item {
+            margin: 8px 0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .modal-close {
+            margin-top: 20px;
+            padding: 8px 20px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .modal-image-container {
+            margin-top: 20px;
+        }
+        
+        .modal-image-title {
+            font-size: 16px;
+            color: #8B4513;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .modal-image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .modal-image-item {
+            width: 120px;
+            height: 80px;
+            cursor: pointer;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .modal-image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .image-preview-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .image-preview-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+        }
+        
+        .image-preview-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>地理维度 - 中国古代桥梁地理分布</h1>
+        
+        <div class="nav">
+            <a href="index.html">返回首页</a>
+            <a href="time.html">时间</a>
+            <a href="geography.html">地理</a>
+            <a href="type.html">类型</a>
+            <a href="decoration.html">装饰</a>
+        </div>
+        
+        <!-- 地图 -->
+        <div class="chart-container">
+            <div class="chart-title">中国古桥地理分布</div>
+            <div id="map-chart" class="chart"></div>
+        </div>
+        
+        <div class="grid-container">
+            <!-- 柱状图 -->
+            <div class="chart-container">
+                <div class="chart-title">省份古桥数量排名</div>
+                <div id="bar-chart" class="small-chart"></div>
+            </div>
+            
+            <!-- 饼图 -->
+            <div class="chart-container">
+                <div class="chart-title">各省古桥数量占比</div>
+                <div id="pie-chart" class="small-chart"></div>
+            </div>
+        </div>
+        
+        <!-- 桥梁信息 -->
+        <div class="chart-container">
+            <div class="chart-title">著名古桥分布</div>
+            <div class="bridge-info">
+                <div class="bridge-card">
+                    <h3>华北地区</h3>
+                    <p>河北：赵州桥、永通桥、弘济桥、安济桥</p>
+                    <p>北京：卢沟桥、万宁桥、十七孔桥</p>
+                    <p>山西：蒲津渡浮桥</p>
+                </div>
+                <div class="bridge-card">
+                    <h3>华东地区</h3>
+                    <p>福建：洛阳桥、安平桥、江东桥、龙江桥、崇庆桥、鸾峰桥</p>
+                    <p>江苏：宝带桥、枫桥、金莲桥、清名桥、五亭桥</p>
+                    <p>浙江：断桥、百梁桥、八字桥、溪东桥、长虹桥、北涧桥</p>
+                    <p>上海：普济桥、迎祥桥、放生桥</p>
+                    <p>山东：信量桥</p>
+                    <p>安徽：虹桥</p>
+                </div>
+                <div class="bridge-card">
+                    <h3>西南地区</h3>
+                    <p>四川：龙脑桥、泸定桥、安澜桥</p>
+                    <p>云南：双龙桥</p>
+                </div>
+                <div class="bridge-card">
+                    <h3>其他地区</h3>
+                    <p>广东：广济桥</p>
+                    <p>江西：太平桥</p>
+                    <p>河南：旅人桥、小商桥、彰善桥</p>
+                    <p>辽宁：永安桥</p>
+                    <p>陕西：灞桥、毓秀桥</p>
+                    <p>甘肃：灞陵桥</p>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 总结分析部分 -->
+        <div class="analysis-container">
+            <h2 class="analysis-title">地理分布分析</h2>
+            <div class="analysis-content">
+                <div class="analysis-section">
+                    <h3 class="analysis-subtitle">地域分布特征</h3>
+                    <p>从地理分布数据可以看出，中国古代桥梁呈现出明显的地域集中性。华东地区，特别是福建、浙江、江苏三省，是古代桥梁最为密集的区域，这与这些地区发达的经济、稠密的人口和便利的水运条件密切相关。福建的洛阳桥、安平桥等跨海大桥的建造，更是体现了古代工匠的卓越技术。</p>
+                    <p>华北地区虽然桥梁数量相对较少，但却拥有赵州桥这样的世界级桥梁杰作，显示了该地区在桥梁技术上的领先地位。西南地区的索桥技术独特，适应了当地复杂的地形条件，是中国古代桥梁多样性的重要体现。</p>
+                </div>
+                <div class="analysis-section">
+                    <h3 class="analysis-subtitle">地理环境与桥梁类型的关系</h3>
+                    <p>不同地理环境孕育了不同类型的桥梁。平原地区多梁桥和拱桥，山区多索桥，水乡多亭桥和廊桥。例如，福建沿海地区多石梁桥，西南山区多索桥，江南水乡多廊桥。这种因地制宜的桥梁建造理念，体现了古代工匠对自然环境的适应和利用能力。</p>
+                    <p>地理环境也影响了桥梁的建筑材料选择。北方多使用石材，南方多使用木材和石材结合，西南地区则多使用竹索和铁索。这种材料选择的差异，反映了各地自然资源的分布特点。</p>
+                </div>
+                <div class="analysis-section">
+                    <h3 class="analysis-subtitle">历史文化与地理分布的联系</h3>
+                    <p>桥梁的地理分布与历史文化的发展密切相关。古代政治、经济中心的地区，桥梁建设往往更为发达。例如，北京作为多朝古都，保存了大量历史悠久的桥梁；江南地区作为经济重心，桥梁数量众多且工艺精湛。</p>
+                    <p>桥梁的分布也反映了古代交通网络的格局。大运河沿线、长江流域、沿海港口城市的桥梁密度明显高于其他地区，这些桥梁作为交通枢纽，对当地经济文化的发展起到了重要的推动作用。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 从data.js获取桥梁数据
+        // 处理数据，提取省份信息
+        function processBridgeData() {
+            return bridgeData.map(bridge => {
+                // 从location中提取省份
+                let location = bridge.location;
+                let province = '';
+                
+                // 直接提取省份名称
+                if (location.includes('北京')) {
+                    province = '北京';
+                } else if (location.includes('上海')) {
+                    province = '上海';
+                } else if (location.includes('天津')) {
+                    province = '天津';
+                } else if (location.includes('重庆')) {
+                    province = '重庆';
+                } else if (location.includes('河北')) {
+                    province = '河北';
+                } else if (location.includes('山西')) {
+                    province = '山西';
+                } else if (location.includes('辽宁')) {
+                    province = '辽宁';
+                } else if (location.includes('吉林')) {
+                    province = '吉林';
+                } else if (location.includes('黑龙江')) {
+                    province = '黑龙江';
+                } else if (location.includes('江苏')) {
+                    province = '江苏';
+                } else if (location.includes('浙江')) {
+                    province = '浙江';
+                } else if (location.includes('安徽')) {
+                    province = '安徽';
+                } else if (location.includes('福建')) {
+                    province = '福建';
+                } else if (location.includes('江西')) {
+                    province = '江西';
+                } else if (location.includes('山东')) {
+                    province = '山东';
+                } else if (location.includes('河南')) {
+                    province = '河南';
+                } else if (location.includes('湖北')) {
+                    province = '湖北';
+                } else if (location.includes('湖南')) {
+                    province = '湖南';
+                } else if (location.includes('广东')) {
+                    province = '广东';
+                } else if (location.includes('广西')) {
+                    province = '广西';
+                } else if (location.includes('海南')) {
+                    province = '海南';
+                } else if (location.includes('四川')) {
+                    province = '四川';
+                } else if (location.includes('贵州')) {
+                    province = '贵州';
+                } else if (location.includes('云南')) {
+                    province = '云南';
+                } else if (location.includes('陕西')) {
+                    province = '陕西';
+                } else if (location.includes('甘肃')) {
+                    province = '甘肃';
+                } else if (location.includes('青海')) {
+                    province = '青海';
+                } else if (location.includes('宁夏')) {
+                    province = '宁夏';
+                } else if (location.includes('新疆')) {
+                    province = '新疆';
+                } else if (location.includes('西藏')) {
+                    province = '西藏';
+                } else {
+                    // 默认处理
+                    province = location.split(' ')[0].split('省')[0].split('市')[0];
+                }
+                
+                return {
+                    name: bridge.name,
+                    province: province,
+                    value: [bridge.lng, bridge.lat, bridge.dynasty, province],
+                    dynasty: bridge.dynasty
+                };
+            });
+        }
+        
+        // 处理后的数据
+        const processedBridgeData = processBridgeData();
+        
+        // 统计各省古桥数量
+        function getProvinceCount() {
+          const count = {};
+          processedBridgeData.forEach((b) => {
+            count[b.province] = (count[b.province] || 0) + 1;
+          });
+          // 按数量从高到低排序
+          return Object.entries(count)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value);
+        }
+        
+        // 1. 地图
+        const mapChart = echarts.init(document.getElementById('map-chart'));
+        
+        // 加载中国地图JSON（从本地文件加载，避免跨域问题）
+        fetch('china.json')
+            .then((res) => res.json())
+            .then((geoJson) => {
+                // 注册中国地图
+                echarts.registerMap('china', geoJson);
+                
+                const mapOption = {
+                    backgroundColor: '#f8fafc',
+                    title: {
+                        text: '中国古桥地理分布',
+                        left: 'center',
+                        textStyle: { fontSize: 18, fontWeight: 'bold' }
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: (params) => {
+                            const [lng, lat, dynasty, province] = params.data.value;
+                            return `
+                                <div style="padding:8px">
+                                    <strong>${params.data.name}</strong><br/>
+                                    省份：${province}<br/>
+                                    朝代：${dynasty}<br/>
+                                    经纬度：${lng.toFixed(4)}, ${lat.toFixed(4)}
+                                </div>
+                            `;
+                        }
+                    },
+                    geo: {
+                        map: 'china',
+                        roam: true,
+                        zoom: 1.2,
+                        center: [104.0, 35.0],
+                        itemStyle: {
+                            areaColor: '#e6f7ff',
+                            borderColor: '#1890ff'
+                        },
+                        emphasis: {
+                            itemStyle: { areaColor: '#b3d8ff' }
+                        }
+                    },
+                    series: [
+                        {
+                            type: 'scatter',
+                            coordinateSystem: 'geo',
+                            data: processedBridgeData.map((b) => ({
+                                name: b.name,
+                                value: b.value
+                            })),
+                            symbolSize: 16,
+                            itemStyle: { color: '#ff4d4f', opacity: 0.8 }
+                        }
+                    ]
+                };
+                
+                mapChart.setOption(mapOption);
+                
+                // 点击散点图事件
+                mapChart.on('click', function(params) {
+                    if (params.data && params.data.name) {
+                        showBridgeDetails(params.data.name);
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error('地图加载失败:', error);
+                // 如果本地加载失败，显示错误提示
+                document.getElementById('map-chart').innerHTML = '<div style="text-align:center;padding:50px;color:#666;">地图加载失败，请刷新重试</div>';
+            });
+        
+        // 2. 柱状图
+        const barChart = echarts.init(document.getElementById('bar-chart'));
+        const provinceData = getProvinceCount();
+        
+        const barOption = {
+            backgroundColor: '#f8fafc',
+            title: {
+                text: '省份古桥数量排名',
+                left: 'center',
+                textStyle: { fontSize: 18, fontWeight: 'bold' }
+            },
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            xAxis: {
+                type: 'value',
+                name: '数量',
+                nameLocation: 'middle',
+                nameGap: 30
+            },
+            yAxis: {
+                type: 'category',
+                data: provinceData.map(item => item.name),
+                inverse: true
+            },
+            series: [
+                {
+                    type: 'bar',
+                    data: provinceData.map(item => item.value),
+                    itemStyle: {
+                        color: (params) => {
+                            const colors = ['#1890ff', '#ff7875', '#2fc25b', '#facc14', '#223273', '#8543e0', '#00b42a', '#f53f3f'];
+                            return colors[params.dataIndex % colors.length];
+                        }
+                    },
+                    label: {
+                        show: true,
+                        position: 'right'
+                    }
+                }
+            ]
+        };
+        
+        barChart.setOption(barOption);
+        
+        // 3. 饼图
+        const pieChart = echarts.init(document.getElementById('pie-chart'));
+        
+        const pieOption = {
+            backgroundColor: '#f8fafc',
+            title: {
+                text: '各省古桥数量占比',
+                left: 'center',
+                textStyle: { fontSize: 18, fontWeight: 'bold' }
+            },
+            tooltip: { trigger: 'item' },
+            series: [
+                {
+                    type: 'pie',
+                    radius: '65%',
+                    data: provinceData,
+                    label: {
+                        formatter: '{b}: {d}%',
+                        fontSize: 14
+                    },
+                    emphasis: {
+                        itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' }
+                    }
+                }
+            ]
+        };
+        
+        pieChart.setOption(pieOption);
+        
+        // 响应式调整
+        window.addEventListener('resize', function() {
+            mapChart.resize();
+            barChart.resize();
+            pieChart.resize();
+        });
+        
+        // 桥梁照片映射
+        const bridgeImages = {
+            '灞桥': ['photos/灞桥.png', 'photos/灞桥数字复原（来源：陕西省考古研究院）.jpg'],
+            '万宁桥': ['photos/万宁桥.jpg'],
+            '五亭桥': ['photos/五亭桥.png', 'photos/五亭桥1.png'],
+            '八字桥': ['photos/八字桥.png'],
+            '北涧桥': ['photos/北涧桥.png'],
+            '十七孔桥': ['photos/十七孔桥.jpg'],
+            '卢沟桥': ['photos/卢沟桥.png'],
+            '双龙桥': ['photos/双龙桥.png', 'photos/双龙桥1.png'],
+            '太平桥': ['photos/太平桥.jpg'],
+            '安平桥': ['photos/安平桥.png'],
+            '安济桥': ['photos/安济桥.png'],
+            '安澜桥': ['photos/安澜桥.png', 'photos/安澜桥1.png'],
+            '崇庆桥': ['photos/崇庆桥.jpg'],
+            '广济桥': ['photos/广济桥.png'],
+            '放生桥': ['photos/放生桥.jpg'],
+            '普济桥': ['photos/普济桥.png'],
+            '毓秀桥': ['photos/毓秀桥.png'],
+            '永安桥': ['photos/永安桥.jpg'],
+            '永通桥': ['photos/永通桥.png'],
+            '江东桥': ['photos/江东桥.png'],
+            '泸定桥': ['photos/泸定桥.png', 'photos/泸定桥俯视.png'],
+            '洛阳桥': ['photos/洛阳桥1.png'],
+            '清名桥': ['photos/清名桥.jpg'],
+            '溪东桥': ['photos/溪东桥.jpg'],
+            '灞陵桥': ['photos/灞陵桥.png'],
+            '百梁桥': ['photos/百梁桥.png'],
+            '迎祥桥': ['photos/迎祥桥.jpg'],
+            '金莲桥': ['photos/金莲桥.png'],
+            '长虹桥': ['photos/长虹桥.jpg'],
+            '鸾峰桥': ['photos/鸾峰桥.png', 'photos/鸾峰桥1.png'],
+            '龙江桥': ['photos/龙江桥.jpg'],
+            '龙脑桥': ['photos/龙脑桥.jpg'],
+            '赵州桥': ['photos/赵州桥.png'],
+            '旅人桥': ['photos/1.旅人桥.png', 'photos/旅人桥.png'],
+            '小商桥': ['photos/2.小商桥.jpeg'],
+            '弘济桥': ['photos/3.弘济桥.jpeg'],
+            '断桥': ['photos/4.断桥.jpeg'],
+            '枫桥': ['photos/5.枫桥.jpg'],
+            '升仙桥': ['photos/6.升仙桥.png'],
+            '蒲津渡浮桥': ['photos/7. 蒲津渡浮桥.jpeg'],
+            '宝带桥': ['photos/8.宝带桥.jpeg'],
+            '虹桥': ['photos/9.虹桥.png'],
+            '信量桥': ['photos/10.信量桥.jpeg'],
+            '彰善桥': ['photos/11. 彰善桥.jpeg']
+        };
+        
+        // 显示桥梁详情
+        function showBridgeDetails(bridgeName) {
+            // 从bridgeData中获取桥梁信息
+            const bridge = bridgeData.find(b => b.name === bridgeName);
+            if (!bridge) return;
+            
+            // 处理年份显示
+            const year = bridge.startYear < 0 ? `${Math.abs(bridge.startYear)} 公元前` : `${bridge.startYear} 年`;
+            
+            // 获取桥梁照片
+            const photos = bridgeImages[bridge.name] || [];
+            
+            // 构建照片HTML
+            let photosHtml = '';
+            if (photos.length > 0) {
+                photosHtml = `
+                    <div class="modal-image-container">
+                        <div class="modal-image-title">桥梁照片</div>
+                        <div class="modal-image-grid">
+                            ${photos.map(photo => `
+                                <div class="modal-image-item" onclick="showImagePreview('${photo}')">
+                                    <img src="${photo}" alt="${bridge.name}">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 创建模态框
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3 class="modal-title">${bridge.name}</h3>
+                    <div class="modal-item">📍 位置：${bridge.location}</div>
+                    <div class="modal-item">🏛️ 朝代：${bridge.dynasty}</div>
+                    <div class="modal-item">🔧 类型：${bridge.type}</div>
+                    <div class="modal-item">📅 始建：${year}</div>
+                    <div class="modal-item">📝 描述：${bridge.desc}</div>
+                    <div class="modal-item">✨ 亮点：${bridge.highlight}</div>
+                    ${photosHtml}
+                    <button class="modal-close" onclick="this.parentElement.parentElement.remove()">关闭</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 点击模态框外部关闭
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            };
+        }
+        
+        // 显示图片预览
+        function showImagePreview(imageSrc) {
+            const previewModal = document.createElement('div');
+            previewModal.className = 'image-preview-modal';
+            previewModal.innerHTML = `
+                <button class="image-preview-close" onclick="this.parentElement.remove()">×</button>
+                <div class="image-preview-content">
+                    <img src="${imageSrc}" alt="桥梁照片">
+                </div>
+            `;
+            
+            document.body.appendChild(previewModal);
+            
+            // 点击模态框外部关闭
+            previewModal.onclick = function(e) {
+                if (e.target === previewModal) {
+                    previewModal.remove();
+                }
+            };
+        }
+    </script>
+</body>
+</html>

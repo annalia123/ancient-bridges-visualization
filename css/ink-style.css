@@ -1,0 +1,340 @@
+/* ============================================
+   古桥千秋 - 水墨风格装饰CSS
+   ============================================ */
+
+/* 水墨晕染背景效果 */
+.ink-bg {
+    position: relative;
+}
+
+.ink-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at 10% 20%, rgba(0,0,0,0.06) 0%, transparent 40%),
+        radial-gradient(ellipse at 90% 80%, rgba(0,0,0,0.04) 0%, transparent 35%),
+        radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 水墨散墨装饰 */
+.ink-splash {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(ellipse at center, rgba(26,26,26,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.ink-splash-sm {
+    width: 50px;
+    height: 50px;
+}
+
+.ink-splash-lg {
+    width: 120px;
+    height: 120px;
+}
+
+/* 散墨位置变体 */
+.ink-splash-tl { top: 5%; left: 5%; }
+.ink-splash-tr { top: 10%; right: 8%; }
+.ink-splash-bl { bottom: 15%; left: 3%; }
+.ink-splash-br { bottom: 5%; right: 10%; }
+.ink-splash-center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+/* 角落装饰边框 */
+.ink-corner {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    opacity: 0.7;
+}
+
+.ink-corner-tl {
+    top: 0;
+    left: 0;
+    border-top: 3px solid #b89f66;
+    border-left: 3px solid #b89f66;
+}
+
+.ink-corner-tr {
+    top: 0;
+    right: 0;
+    border-top: 3px solid #b89f66;
+    border-right: 3px solid #b89f66;
+}
+
+.ink-corner-bl {
+    bottom: 0;
+    left: 0;
+    border-bottom: 3px solid #b89f66;
+    border-left: 3px solid #b89f66;
+}
+
+.ink-corner-br {
+    bottom: 0;
+    right: 0;
+    border-bottom: 3px solid #b89f66;
+    border-right: 3px solid #b89f66;
+}
+
+/* 标题装饰 */
+.ink-title {
+    position: relative;
+    display: inline-block;
+    padding: 0 30px;
+}
+
+.ink-title::before,
+.ink-title::after {
+    content: '◆';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.6rem;
+    color: #b89f66;
+}
+
+.ink-title::before {
+    left: 5px;
+}
+
+.ink-title::after {
+    right: 5px;
+}
+
+/* 标题下划线装饰 */
+.ink-underline {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 15px;
+}
+
+.ink-underline::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(to right, transparent, #b22c2c, transparent);
+}
+
+/* 装饰性分隔线 */
+.ink-divider {
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #b89f66, transparent);
+    margin: 20px auto;
+    position: relative;
+}
+
+.ink-divider::before {
+    content: '❖';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f2efe6;
+    padding: 0 10px;
+    color: #b89f66;
+    font-size: 1.2rem;
+}
+
+/* 卡片容器装饰 */
+.ink-card {
+    position: relative;
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.ink-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid transparent;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #1a1a1a, #333, #1a1a1a) padding-box,
+                linear-gradient(135deg, #b89f66, #b22c2c, #b89f66) border-box;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ink-card:hover::before {
+    opacity: 1;
+}
+
+.ink-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+/* 边框装饰线条 */
+.ink-border {
+    position: relative;
+}
+
+.ink-border::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 1px solid rgba(184,159,102,0.3);
+    border-radius: 20px;
+    pointer-events: none;
+}
+
+/* 页面通用背景 */
+.ink-page-bg {
+    background-color: #f2efe6;
+    background-image:
+        radial-gradient(circle at 5% 15%, rgba(0,0,0,0.03) 0%, transparent 25%),
+        radial-gradient(circle at 95% 85%, rgba(0,0,0,0.03) 0%, transparent 25%),
+        url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* 导航栏装饰 */
+.ink-nav {
+    position: relative;
+}
+
+.ink-nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #b89f66 20%, #b89f66 80%, transparent);
+}
+
+/* 按钮装饰 */
+.ink-btn {
+    position: relative;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #b22c2c, #8c4b31);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.ink-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.ink-btn:hover::before {
+    left: 100%;
+}
+
+.ink-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(178,44,44,0.4);
+}
+
+/* 装饰性印章 */
+.ink-seal {
+    display: inline-block;
+    padding: 8px 15px;
+    border: 3px solid #b22c2c;
+    border-radius: 5px;
+    color: #b22c2c;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transform: rotate(-5deg);
+    opacity: 0.8;
+}
+
+/* 祥云装饰 */
+.ink-cloud {
+    position: absolute;
+    width: 150px;
+    height: 80px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.03) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.ink-cloud-1 { top: 10%; right: 5%; transform: scale(1.5); }
+.ink-cloud-2 { bottom: 20%; left: 3%; transform: scale(1.2); }
+.ink-cloud-3 { top: 60%; right: 8%; transform: scale(0.8); }
+
+/* 竹节装饰 */
+.ink-bamboo {
+    position: relative;
+    padding-left: 30px;
+}
+
+.ink-bamboo::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom,
+        #8c4b31 0%, #8c4b31 20%,
+        transparent 20%, transparent 25%,
+        #8c4b31 25%, #8c4b31 45%,
+        transparent 45%, transparent 50%,
+        #8c4b31 50%, #8c4b31 70%,
+        transparent 70%, transparent 75%,
+        #8c4b31 75%, #8c4b31 100%);
+}
+
+/* 墨点装饰 */
+.ink-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    margin: 0 5px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .ink-corner {
+        width: 40px;
+        height: 40px;
+    }
+
+    .ink-splash {
+        width: 50px;
+        height: 50px;
+    }
+
+    .ink-title {
+        padding: 0 20px;
+    }
+
+    .ink-title::before,
+    .ink-title::after {
+        font-size: 0.5rem;
+    }
+}

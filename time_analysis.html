@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国桥梁 · 时间数据分析</title>
+    <!-- 引入 Google Fonts (思源宋体) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- 引入 ECharts -->
+    <script src="js/echarts.min.js"></script>
+    <!-- 引入数据 -->
+    <script src="data.js"></script>
+    <style>
+        :root {
+            --bg-paper: #f2efe6; /* 更深一点的宣纸色 */
+            --ink-black: #1a1a1a;
+            --cinnabar: #b22c2c; /* 更沉稳的朱砂红 */
+            --indigo: #2c3e50;   /* 黛蓝 */
+            --gold: #b89f66;     /* 暗金 */
+            --border-color: #8c4b31;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', 'SimSun', serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-paper);
+            /* 复杂的SVG纹理模拟宣纸和淡淡的水墨底纹 */
+            background-image: 
+                radial-gradient(circle at 5% 15%, rgba(0,0,0,0.04) 0%, transparent 25%),
+                radial-gradient(circle at 95% 85%, rgba(0,0,0,0.04) 0%, transparent 25%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            color: var(--ink-black);
+            line-height: 1.8;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 水墨散墨装饰 */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        body::before {
+            top: 15%;
+            right: 8%;
+        }
+        
+        body::after {
+            bottom: 20%;
+            left: 5%;
+        }
+
+        /* --- 沉浸式首屏 (Hero Section) --- */
+        .hero-section {
+            position: relative;
+            height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20chinese%20bridge%20over%20river%2C%20traditional%20ink%20painting%2C%20misty%20atmosphere%2C%20historical%20chinese%20style&image_size=landscape_16_9');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* --- 粘性导航 --- */
+        .nav-container {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(242, 239, 230, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--gold);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        /* 导航顶部装饰线 */
+        .nav-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--cinnabar), transparent);
+        }
+        
+        .nav-bar {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            padding: 15px 20px;
+            gap: 30px;
+        }
+        
+        .nav-btn {
+            background: none;
+            border: none;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            color: var(--indigo);
+            cursor: pointer;
+            padding: 8px 16px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn::before {
+            content: '「';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-btn::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: var(--cinnabar);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-btn:hover, .nav-btn.active {
+            color: var(--cinnabar);
+            font-weight: bold;
+        }
+        
+        .nav-btn:hover::before,
+        .nav-btn:hover::after {
+            opacity: 1;
+            width: 80%;
+        }
+
+        /* --- 主体内容 --- */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px 60px;
+        }
+
+        /* 图表部分 */
+        .charts-section {
+            margin: 60px 0;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--gold);
+        }
+
+        .charts-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--indigo);
+            margin-bottom: 40px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .chart-container {
+            margin-bottom: 40px;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            color: var(--cinnabar);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .chart {
+            height: 400px;
+            width: 100%;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* 分析部分样式 */
+        .analysis-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analysis-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--cinnabar), var(--gold));
+        }
+
+        .analysis-title {
+            font-size: 1.8rem;
+            color: var(--indigo);
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .analysis-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .analysis-section {
+            background: rgba(242, 239, 230, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--cinnabar);
+            transition: all 0.3s ease;
+        }
+
+        .analysis-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .analysis-subtitle {
+            font-size: 1.3rem;
+            color: var(--cinnabar);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .analysis-section p {
+            color: var(--indigo);
+            line-height: 1.7;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .analysis-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 回到时间线按钮 */
+        .back-to-timeline {
+            display: flex;
+            justify-content: center;
+            margin: 60px 0;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--indigo), #34495e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(44, 62, 80, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(44, 62, 80, 0.4);
+            background: linear-gradient(135deg, #34495e, var(--indigo));
+        }
+
+        .arrow-up {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        /* 页脚 */
+        footer {
+            background: var(--indigo);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 60px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart {
+                height: 350px;
+            }
+            
+            .nav-bar {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 沉浸式首屏 -->
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1>桥梁时间数据分析</h1>
+        <div class="hero-subtitle">从时间维度探索中国古代桥梁的发展规律</div>
+    </div>
+</div>
+
+<!-- 粘性导航 -->
+<div class="nav-container">
+    <div class="nav-bar" id="nav-bar">
+        <button class="nav-btn" onclick="window.location.href='index.html'">首页</button>
+        <button class="nav-btn active" onclick="window.location.href='time.html'">时间维度</button>
+        <button class="nav-btn" onclick="window.location.href='geography.html'">地理维度</button>
+        <button class="nav-btn" onclick="window.location.href='type.html'">类型维度</button>
+        <button class="nav-btn" onclick="window.location.href='decoration.html'">装饰维度</button>
+    </div>
+</div>
+
+<div class="container">
+    <!-- 图表部分 -->
+    <div class="charts-section">
+        <h2 class="charts-title">桥梁发展数据分析</h2>
+        
+        <!-- 时间轴图表 -->
+        <div class="chart-container">
+            <div class="chart-title">桥梁时间分布</div>
+            <div id="time-chart" class="chart"></div>
+        </div>
+        
+        <div class="grid-container">
+            <!-- 桥梁类型时间趋势 -->
+            <div class="chart-container">
+                <div class="chart-title">桥梁类型时间趋势</div>
+                <div id="type-trend-chart" class="chart"></div>
+            </div>
+            
+            <!-- 桥梁建造年代分布 -->
+            <div class="chart-container">
+                <div class="chart-title">桥梁建造年代分布</div>
+                <div id="year-distribution-chart" class="chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 总结分析部分 -->
+    <div class="analysis-container">
+        <h2 class="analysis-title">历史桥梁发展分析</h2>
+        <div class="analysis-content">
+            <div class="analysis-section">
+                <h3 class="analysis-subtitle">时间演进趋势</h3>
+                <p>从图表数据可以看出，中国古代桥梁的发展呈现出明显的历史阶段性特征。隋唐时期是桥梁建设的第一个高峰，这与当时经济繁荣、技术进步密切相关。宋代至明清时期，桥梁数量持续增长，特别是明清两代，桥梁建设达到了历史巅峰，这反映了当时社会经济的高度发展和建筑技术的成熟。</p>
+                <p>从桥梁类型的演变来看，早期桥梁以梁桥为主，随着技术的进步，拱桥逐渐成为主流，特别是石拱桥的出现和普及，标志着中国桥梁技术的重大突破。索桥的出现则适应了特殊地理环境的需求，体现了古代工匠的创新精神。</p>
+            </div>
+            <div class="analysis-section">
+                <h3 class="analysis-subtitle">技术与文化融合</h3>
+                <p>中国古代桥梁不仅是交通设施，更是文化载体。从灞桥的折柳送别的文化内涵，到卢沟桥的石狮雕刻艺术，桥梁与文化紧密结合。桥梁的装饰元素从简单到复杂，从实用到艺术，反映了不同时期的审美观念和文化特色。</p>
+                <p>桥梁建设技术的发展也体现了中国古代科技的进步。从早期的木梁桥到后来的石拱桥、索桥，从简单的梁式结构到复杂的拱券技术，每一次技术突破都推动了桥梁建设的发展。特别是宋代《营造法式》的颁布，对桥梁建设的标准化和规范化起到了重要作用。</p>
+            </div>
+            <div class="analysis-section">
+                <h3 class="analysis-subtitle">历史价值与启示</h3>
+                <p>中国古代桥梁是中华民族智慧的结晶，它们不仅具有实用价值，更具有重要的历史、艺术和科学价值。这些桥梁见证了中国古代社会的发展变迁，是研究中国古代建筑技术、交通史、文化史的重要实物资料。</p>
+                <p>从古代桥梁的发展中，我们可以得到许多启示：重视技术创新、注重因地制宜、强调文化融合。这些经验对于现代桥梁建设仍然具有重要的参考价值。同时，保护和传承这些珍贵的历史文化遗产，也是我们当代人的责任。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 回到时间线按钮 -->
+    <div class="back-to-timeline">
+        <button class="back-btn" onclick="window.location.href='time.html'">
+            <i class="arrow-up"></i>
+            <span>回到时间线</span>
+        </button>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 中国古代桥梁地理分布研究 · 数据来源：历史文献整理</p>
+</footer>
+
+<script>
+    // 1. 处理数据，按朝代分组
+    const bridgesByDynasty = {};
+    const bridgesByType = {};
+    const bridgesByYear = [];
+
+    bridgeData.forEach(bridge => {
+        // 按朝代分组
+        if (!bridgesByDynasty[bridge.dynasty]) {
+            bridgesByDynasty[bridge.dynasty] = [];
+        }
+        bridgesByDynasty[bridge.dynasty].push(bridge);
+
+        // 按类型分组
+        if (!bridgesByType[bridge.type]) {
+            bridgesByType[bridge.type] = [];
+        }
+        bridgesByType[bridge.type].push(bridge);
+
+        // 按年份分组
+        bridgesByYear.push({
+            name: bridge.name,
+            year: bridge.startYear,
+            dynasty: bridge.dynasty
+        });
+    });
+
+    // 2. 桥梁时间分布图表
+    const timeChart = echarts.init(document.getElementById('time-chart'));
+    const timeOption = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: Object.keys(bridgesByDynasty).sort(),
+            axisLabel: {
+                interval: 0,
+                rotate: 45
+            }
+        },
+        yAxis: {
+            type: 'value',
+            name: '桥梁数量'
+        },
+        series: [{
+            name: '桥梁数量',
+            type: 'bar',
+            data: Object.keys(bridgesByDynasty).sort().map(dynasty => bridgesByDynasty[dynasty].length),
+            itemStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: '#b22c2c' },
+                    { offset: 1, color: '#e67e22' }
+                ])
+            }
+        }]
+    };
+    timeChart.setOption(timeOption);
+
+    // 3. 桥梁类型时间趋势图表
+    const typeTrendChart = echarts.init(document.getElementById('type-trend-chart'));
+    
+    // 计算每个朝代各类型桥梁的数量
+    const dynastyTypes = {};
+    const types = Object.keys(bridgesByType);
+    
+    Object.keys(bridgesByDynasty).sort().forEach(dynasty => {
+        dynastyTypes[dynasty] = {};
+        types.forEach(type => {
+            dynastyTypes[dynasty][type] = 0;
+        });
+        
+        bridgesByDynasty[dynasty].forEach(bridge => {
+            dynastyTypes[dynasty][bridge.type]++;
+        });
+    });
+    
+    const typeTrendOption = {
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: types,
+            orient: 'vertical',
+            right: '5%',
+            top: 'center',
+            itemWidth: 12,
+            itemHeight: 12,
+            textStyle: {
+                fontSize: 11
+            }
+        },
+        grid: {
+            left: '15%',
+            right: '25%',
+            bottom: '15%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: Object.keys(bridgesByDynasty).sort(),
+            axisLabel: {
+                rotate: 45,
+                fontSize: 10
+            }
+        },
+        yAxis: {
+            type: 'value',
+            name: '数量',
+            nameTextStyle: {
+                fontSize: 12
+            }
+        },
+        series: types.map((type, index) => {
+            const colors = ['#b22c2c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e74c3c'];
+            return {
+                name: type,
+                type: 'line',
+                stack: 'Total',
+                data: Object.keys(bridgesByDynasty).sort().map(dynasty => dynastyTypes[dynasty][type]),
+                itemStyle: {
+                    color: colors[index % colors.length]
+                },
+                symbol: 'circle',
+                symbolSize: 6,
+                lineStyle: {
+                    width: 2
+                }
+            };
+        })
+    };
+    typeTrendChart.setOption(typeTrendOption);
+
+    // 4. 桥梁建造年代分布图表
+    const yearDistributionChart = echarts.init(document.getElementById('year-distribution-chart'));
+    
+    // 按年代分组
+    const yearGroups = {};
+    bridgesByYear.forEach(bridge => {
+        const century = Math.floor(bridge.year / 100) * 100;
+        if (!yearGroups[century]) {
+            yearGroups[century] = 0;
+        }
+        yearGroups[century]++;
+    });
+    
+    const yearDistributionOption = {
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}年: {c}座桥梁'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        series: [{
+            name: '桥梁数量',
+            type: 'pie',
+            radius: '60%',
+            data: Object.keys(yearGroups).map(year => ({
+                name: year,
+                value: yearGroups[year]
+            })),
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }]
+    };
+    yearDistributionChart.setOption(yearDistributionOption);
+
+    // 响应式调整
+    window.addEventListener('resize', function() {
+        timeChart.resize();
+        typeTrendChart.resize();
+        yearDistributionChart.resize();
+    });
+</script>
+</body>
+</html>

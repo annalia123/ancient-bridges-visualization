@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古桥千秋——桥梁历史故事</title>
+    <!-- 引入 Google Fonts (思源宋体) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- AI辅助生成：豆包, 2026-04-17 -->
+    <style>
+        :root {
+            --bg-paper: #f2efe6;
+            --ink-black: #1a1a1a;
+            --cinnabar: #b22c2c;
+            --indigo: #2c3e50;
+            --gold: #b89f66;
+            --border-color: #8c4b31;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', 'SimSun', serif;
+            background-color: var(--bg-paper);
+            color: var(--ink-black);
+            line-height: 1.8;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        
+        /* 故事线样式 */
+        .storyline {
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .story-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+        
+        .story-section:nth-child(1) {
+            background: linear-gradient(135deg, rgba(178,44,44,0.1) 0%, rgba(44,62,80,0.1) 100%), url('photos/中国桥梁发展历程背景图 (1).png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .story-section:nth-child(2) {
+            background: linear-gradient(135deg, rgba(178,44,44,0.15) 0%, rgba(44,62,80,0.15) 100%), url('photos/中国桥梁发展历程背景图 (2).png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .story-section:nth-child(3) {
+            background: linear-gradient(135deg, rgba(178,44,44,0.2) 0%, rgba(44,62,80,0.2) 100%), url('photos/中国桥梁发展历程背景图 (3).png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .story-section:nth-child(4) {
+            background: linear-gradient(135deg, rgba(178,44,44,0.18) 0%, rgba(44,62,80,0.18) 100%), url('photos/中国桥梁发展历程背景图 (4).png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .story-section:nth-child(5) {
+            background: linear-gradient(135deg, rgba(178,44,44,0.22) 0%, rgba(44,62,80,0.22) 100%), url('photos/中国桥梁发展历程背景图 (4).png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .story-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+
+        
+        .story-content {
+            text-align: center;
+            color: #2c3e50;
+            background: rgba(248, 252, 247, 0.95);
+            padding: 50px 70px;
+            border-radius: 20px;
+            max-width: 800px;
+            margin: 0 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            position: relative;
+            z-index: 2;
+            border: 2px solid rgba(184, 159, 102, 0.3);
+            backdrop-filter: blur(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .story-content:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        
+        .story-title {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #b22c2c;
+            font-weight: bold;
+            letter-spacing: 3px;
+            border-bottom: 2px solid rgba(184, 159, 102, 0.5);
+            padding-bottom: 20px;
+            animation: fadeInUp 1s ease forwards;
+        }
+        
+        .story-text {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+            animation: fadeInUp 1s ease 0.3s forwards;
+            opacity: 0;
+        }
+        
+        /* 进入首页按钮 */
+        .enter-home {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--bg-paper) 0%, #e8e3d8 100%);
+            position: relative;
+        }
+        
+        .enter-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
+        
+        .enter-title {
+            font-size: 2.5rem;
+            color: var(--indigo);
+            margin-bottom: 30px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .enter-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, var(--cinnabar) 0%, #9a2525 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(178, 44, 44, 0.4);
+            text-decoration: none;
+        }
+        
+        .enter-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(178, 44, 44, 0.6);
+        }
+        
+        .enter-btn i {
+            margin-left: 10px;
+            font-size: 1.4rem;
+            animation: bounce 2s infinite;
+        }
+        
+        /* 装饰元素 */
+        .decorative-element {
+            position: absolute;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .decorative-element:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            font-size: 100px;
+            color: var(--cinnabar);
+        }
+        
+        .decorative-element:nth-child(2) {
+            bottom: 15%;
+            right: 8%;
+            font-size: 80px;
+            color: var(--gold);
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .story-content {
+                padding: 30px 40px;
+            }
+            
+            .story-title {
+                font-size: 2.2rem;
+            }
+            
+            .story-text {
+                font-size: 1.1rem;
+            }
+            
+            .enter-title {
+                font-size: 2rem;
+            }
+            
+            .enter-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 故事线 -->
+    <div class="storyline">
+        <section class="story-section">
+            <div class="story-content">
+                <h2 class="story-title">桥梁的起源</h2>
+                <p class="story-text">在远古时代，中国先民就开始利用自然条件建造简易桥梁。最早的桥梁可能是利用倒下的树木或藤蔓搭建的渡河工具，开启了人类征服江河的伟大征程。</p>
+            </div>
+        </section>
+        
+        <section class="story-section">
+            <div class="story-content">
+                <h2 class="story-title">秦汉时期的奠基</h2>
+                <p class="story-text">秦汉时期，桥梁建设进入快速发展阶段。秦始皇统一六国后，大规模修筑道路桥梁，促进了全国交通网络的形成。汉代出现了最早的石拱桥雏形，为后世桥梁发展奠定了基础。</p>
+            </div>
+        </section>
+        
+        <section class="story-section">
+            <div class="story-content">
+                <h2 class="story-title">唐宋时期的繁荣</h2>
+                <p class="story-text">唐宋时期是中国桥梁建筑的黄金时代。赵州桥的建成标志着石拱桥技术的成熟，唐代桥梁数量激增，促进了商业贸易和文化交流。宋代桥梁设计更加注重实用性和美观性。</p>
+            </div>
+        </section>
+        
+        <section class="story-section">
+            <div class="story-content">
+                <h2 class="story-title">明清时期的巅峰</h2>
+                <p class="story-text">明清时期，桥梁建筑达到历史巅峰。卢沟桥、广济桥等著名桥梁相继建成，不仅具有实用价值，更融入了丰富的装饰艺术，成为中国古代建筑艺术的瑰宝。</p>
+            </div>
+        </section>
+        
+        <section class="story-section">
+            <div class="story-content">
+                <h2 class="story-title">现代的传承与保护</h2>
+                <p class="story-text">进入现代，中国政府高度重视古桥保护工作。通过科学修复和技术手段，让这些承载千年历史的桥梁继续为后人讲述古代文明的辉煌故事。</p>
+            </div>
+        </section>
+        
+        <!-- 进入首页部分 -->
+        <section class="enter-home">
+            <div class="decorative-element">桥</div>
+            <div class="decorative-element">梁</div>
+            <div class="enter-content">
+                <h2 class="enter-title">探索古桥的魅力</h2>
+                <a href="index.html" class="enter-btn">
+                    那就进入正题吧 <i>↓</i>
+                </a>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // 故事线滚动动画
+        const storySections = document.querySelectorAll('.story-section');
+        
+        function checkVisibility() {
+            const triggerBottom = window.innerHeight / 5 * 4;
+            
+            storySections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                
+                if (sectionTop < triggerBottom) {
+                    section.classList.add('visible');
+                } else {
+                    section.classList.remove('visible');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', checkVisibility);
+        // 初始检查
+        checkVisibility();
+        
+        // 平滑滚动效果
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
